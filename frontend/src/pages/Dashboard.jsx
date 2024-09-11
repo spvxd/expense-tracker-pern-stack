@@ -1,10 +1,10 @@
 // src/components/Dashboard.js
 
-import React from "react";
+import React, {useEffect} from "react";
 import styled from "styled-components";
 import TransactionCard from "../components/TransactionCard";
 import Sidebar from "../components/Sidebar.jsx";
-
+import {useGlobalContext} from "../context/context.jsx";
 
 // Стиль для контейнера Dashboard
 const DashboardContainer = styled.div`
@@ -91,25 +91,29 @@ const CardValue = styled.div`
 `;
 
 const Dashboard = () => {
+    const {incomes, expenses, getAllIncomes, getAllExpenses, totalIncomes, totalExpenses, totalBalance} = useGlobalContext()
+    useEffect(() => {
+        getAllExpenses()
+        getAllIncomes()
+    }, []);
     return (
         <>
             <Sidebar></Sidebar>
             <DashboardContainer>
-                {/* Левая часть с графиком и статистикой */}
                 <LeftSection>
                     <GraphPlaceholder>Graph Placeholder</GraphPlaceholder>
                     <StatsContainer>
                         <Card>
                             <CardTitle>Total Income</CardTitle>
-                            <CardValue color="#28a745">$15200</CardValue>
+                            <CardValue color="#28a745">{totalIncomes()} руб.</CardValue>
                         </Card>
                         <Card>
                             <CardTitle>Total Expenses</CardTitle>
-                            <CardValue color="#dc3545">$3920</CardValue>
+                            <CardValue color="#dc3545">{totalExpenses()} руб.</CardValue>
                         </Card>
                         <Card>
                             <CardTitle>Total Balance</CardTitle>
-                            <CardValue color="#28a745">$11280</CardValue>
+                            <CardValue color="#28a745">{totalBalance()} руб.</CardValue>
                         </Card>
                     </StatsContainer>
                 </LeftSection>
@@ -123,15 +127,15 @@ const Dashboard = () => {
                     <Card style={{marginTop: "20px"}}>
                         <CardTitle>Salary</CardTitle>
                         <CardValue color="#333">
-                            <div>Min: $1200</div>
-                            <div>Max: $8000</div>
+                            <div>Min: {Math.min(...incomes.map(item => item.amount))} руб.</div>
+                            <div>Max: {Math.max(...incomes.map(item => item.amount))} руб.</div>
                         </CardValue>
                     </Card>
                     <Card style={{marginTop: "20px"}}>
                         <CardTitle>Expense</CardTitle>
                         <CardValue color="#333">
-                            <div>Min: $120</div>
-                            <div>Max: $3000</div>
+                            <div>Min: {Math.min(...expenses.map(item => item.amount))} руб.</div>
+                            <div>Max: {Math.max(...expenses.map(item => item.amount))} руб.</div>
                         </CardValue>
                     </Card>
                 </RightSection>

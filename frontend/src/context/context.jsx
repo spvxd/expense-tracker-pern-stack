@@ -92,6 +92,9 @@ export const GlobalProvider = ({children}) => {
 
         return totalIncome;
     }
+    const totalBalance = () => {
+        return totalIncomes() - totalExpenses()
+    }
 
 
     return (
@@ -106,6 +109,7 @@ export const GlobalProvider = ({children}) => {
             getAllIncomes,
             deleteIncomes,
             totalExpenses,
+            totalBalance,
             error,
             setError
         }}>

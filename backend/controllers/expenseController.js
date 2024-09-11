@@ -18,7 +18,7 @@ class ExpenseController {
 
     async getAllExpenses(req, res) {
         try {
-            const allIncomes = (await Expense.findAll({raw: true}))
+            const allIncomes = (await Expense.findAll({raw: true, order: [['createdAt', 'DESC']]}))
             return res.status(200).json(allIncomes)
         } catch (err) {
             console.log(err)
