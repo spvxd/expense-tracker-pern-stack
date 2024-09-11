@@ -117,7 +117,7 @@ const Sidebar = () => {
                         <FontAwesomeIcon icon={faUserCircle} size="2x" color="#333"/>
                     </Avatar>
                     <UserInfo>
-                        <UserName>Mike</UserName>
+                        <UserName>Alex</UserName>
                         <div>Your Money</div>
                     </UserInfo>
                 </Profile>

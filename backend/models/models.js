@@ -6,7 +6,7 @@ const Income =  sequelize.define('income', {
     title: {type: DataTypes.STRING},
     amount: {type: DataTypes.INTEGER},
     type: {type: DataTypes.STRING, defaultValue: 'income'},
-    date: {type: DataTypes.DATE},
+    date: {type: DataTypes.DATEONLY},
     category: {type: DataTypes.STRING},
     description: {type: DataTypes.STRING},
 })
@@ -16,7 +16,7 @@ const Expense =  sequelize.define('expense', {
     title: {type: DataTypes.STRING},
     amount: {type: DataTypes.INTEGER},
     type: {type: DataTypes.STRING, defaultValue: 'expense'},
-    date: {type: DataTypes.DATE},
+    date: {type: DataTypes.DATEONLY},
     category: {type: DataTypes.STRING},
     description: {type: DataTypes.STRING},
 })

@@ -8,6 +8,7 @@ import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import Sidebar from "./components/Sidebar.jsx";
 import Incomes from "./pages/Incomes.jsx";
 import Expense from "./pages/Expense.jsx";
+import { useGlobalContext } from './context/context.jsx';
 
 const AppContainer = styled.div`
     display: flex;
@@ -15,6 +16,8 @@ const AppContainer = styled.div`
 `;
 
 function App() {
+    const global = useGlobalContext()
+    console.log(global);
     return (
         <AppContainer>
             <Router>

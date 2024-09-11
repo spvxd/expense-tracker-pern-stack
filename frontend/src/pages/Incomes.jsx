@@ -16,7 +16,8 @@ import {
     faPaintBrush,
 } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from "../components/Sidebar.jsx";
-import {deleteIncomes, getAllIncomes} from "../api/api.js";
+import {createNewExpense, createNewIncome, deleteIncomes, getAllExpenses, getAllIncomes} from "../api/api.js";
+import {useGlobalContext} from "../context/context.jsx";
 
 const IncomePageContainer = styled.div`
   display: flex;
@@ -153,13 +154,16 @@ const IncomeDetails = styled.div`
 `;
 
 const IncomeTitle = styled.h3`
-  font-size: 16px;
+  font-size: 20px;
   color: #333;
+  margin-bottom: 5px;
 `;
 
 const IncomeDescription = styled.p`
-  font-size: 14px;
+  font-size: 17px;
   color: #666;
+  margin-top: 0;
+  margin-bottom: 5px;
 `;
 
 const IncomeAmount = styled.div`
@@ -178,37 +182,26 @@ const DeleteButton = styled.button`
 `;
 
 const Incomes = () => {
-    const [income, setIncome] = useState([])
     const [newIncome, setNewIncome] = useState({
         title: '',
         amount: '',
         date: '',
-        option: '',
+        category: 'Прочие расходы',
         description: ''
     })
+    const {incomes, createNewIncome , getAllIncomes, deleteIncomes, totalIncomes} = useGlobalContext()
     useEffect(() => {
-        const expenses = getAllIncomes().then(res => {
-            setIncome(res)
-        })
+        getAllIncomes()
 
     }, []);
-    const handleDelete = async (id) => {
-        await deleteIncomes(id).then(() => {
-            getAllIncomes().then(res => {
-                setIncome(res)
-            })
-        })
-    }
-    const handleSubmit = async () => {
-        console.log(newIncome)
-    }
+
     return (
         <>
             <Sidebar></Sidebar>
         <IncomePageContainer>
             <Header>
                 <Title>Incomes</Title>
-                <TotalIncome>Total Income: $16500</TotalIncome>
+                <TotalIncome>Total Income: {totalIncomes()}</TotalIncome>
             </Header>
             <ContentContainer>
                 <IncomeForm>
@@ -226,36 +219,37 @@ const Incomes = () => {
                     </FormField>
                     <FormField>
                         <Label>Select Option</Label>
-                        <Select  onChange={e => setNewIncome({...newIncome, option: e.target.value})}>
-                            <option value="">Select Option</option>
-                            <option value="freelance">Freelance</option>
-                            <option value="shopify">Shopify</option>
-                            <option value="youtube">YouTube Adsense</option>
-                            <option value="developer">Developer Salary</option>
+                        <Select  onChange={e => setNewIncome({...newIncome, category: e.target.value})} required>
+                            <option value="" selected disabled hidden>Выберите категорию</option>
+                            <option value="Зарплата" >Зарплата</option>
+                            <option value="Подарки">Подарки</option>
+                            <option value="Фриланс">Фриланс</option>
+                            <option value="Прочие расходы">Прочие расходы</option>
                         </Select>
                     </FormField>
                     <FormField>
                         <Label>Add A Reference</Label>
                         <Input type="text" placeholder="Add A Reference"  onChange={e => setNewIncome({...newIncome, description: e.target.value})} />
                     </FormField>
-                    <AddIncomeButton onClick={handleSubmit}>+ Add Income</AddIncomeButton>
+                    <AddIncomeButton onClick={() => createNewIncome(newIncome)}>+ Add Income</AddIncomeButton>
                 </IncomeForm>
                 <IncomeList>
-                    {income.map((item) => (
+                    {incomes.map((item) => (
                         <IncomeItem key={item.id}>
                             <IncomeInfo>
                                 <IconWrapper>
                                     <FontAwesomeIcon icon={faGlobe} color="#007bff" />
                                 </IconWrapper>
                                 <IncomeDetails>
-                                    <IncomeTitle>{item.title}</IncomeTitle>
+                                    <IncomeTitle>Название: {item.title}</IncomeTitle>
+                                    <IncomeDescription>Категория: {item.category}</IncomeDescription>
                                     <IncomeDescription>
-                                        ${item.amount} • {item.date} • {item.description}
+                                        Потрачено: {item.amount} руб. • Дата: {item.date} • Описание: {item.description}
                                     </IncomeDescription>
                                 </IncomeDetails>
                             </IncomeInfo>
                             <DeleteButton>
-                                <FontAwesomeIcon icon={faTrashAlt} onClick={() => handleDelete(item.id)} />
+                                <FontAwesomeIcon icon={faTrashAlt} onClick={() => deleteIncomes(item.id)} />
                             </DeleteButton>
                         </IncomeItem>
                     ))}

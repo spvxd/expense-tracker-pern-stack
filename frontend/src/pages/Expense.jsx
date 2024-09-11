@@ -1,8 +1,8 @@
-
 import React, {useEffect, useState} from 'react';
-import {deleteExpense, deleteIncomes, getAllExpenses, getAllIncomes} from '../api/api.js'
+import { useGlobalContext } from '../context/context.jsx';
+import {createNewExpense, deleteExpense, deleteIncomes, getAllExpenses, getAllIncomes} from '../api/api.js'
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {
     faGlobe,
     faPiggyBank,
@@ -77,6 +77,7 @@ const Input = styled.input`
   border: 1px solid #ddd;
   border-radius: 4px;
   outline: none;
+
   &:focus {
     border-color: #007bff;
   }
@@ -88,6 +89,7 @@ const Select = styled.select`
   border: 1px solid #ddd;
   border-radius: 4px;
   outline: none;
+
   &:focus {
     border-color: #007bff;
   }
@@ -101,6 +103,7 @@ const AddIncomeButton = styled.button`
   border: none;
   border-radius: 4px;
   cursor: pointer;
+
   &:hover {
     background-color: #e84357;
   }
@@ -115,9 +118,11 @@ const IncomeList = styled.div`
   max-height: 600px; /* Fixed height for scrolling */
   overflow-y: auto; /* Enable vertical scrolling */
   padding-right: 10px; /* To ensure scrollbar does not overlay the list */
+
   &::-webkit-scrollbar {
     width: 8px; /* Scrollbar width */
   }
+
   &::-webkit-scrollbar-thumb {
     background-color: #ddd; /* Scrollbar thumb color */
     border-radius: 4px; /* Rounded scrollbar thumb */
@@ -152,13 +157,17 @@ const IncomeDetails = styled.div`
 `;
 
 const IncomeTitle = styled.h3`
-  font-size: 16px;
+  font-size: 20px;
   color: #333;
+  margin-bottom: 5px;
 `;
 
+
 const IncomeDescription = styled.p`
-  font-size: 14px;
+  font-size: 17px;
   color: #666;
+  margin-top: 0;
+  margin-bottom: 5px;
 `;
 
 const IncomeAmount = styled.div`
@@ -171,92 +180,85 @@ const DeleteButton = styled.button`
   background: transparent;
   color: #ff4757;
   cursor: pointer;
+
   &:hover {
     color: #e84357;
   }
 `;
 
 const Expense = () => {
-    const [expense, setExpense] = useState([])
+    const {expenses, createNewExpense , getAllExpenses, deleteExpense, totalExpenses} = useGlobalContext()
     const [newExpense, setNewExpense] = useState({
         title: '',
         amount: '',
         date: '',
-        option: '',
+        category: 'Прочие расходы',
         description: ''
     })
-    useEffect(() => {
-    const expenses = getAllExpenses().then(res => {
-        setExpense(res)
-    })
 
+    useEffect(() => {
+        getAllExpenses()
     }, []);
 
-    const handleDelete = async (id) => {
-        await deleteExpense(id).then(() => {
-            getAllExpenses().then(res => {
-                setExpense(res)
-            })
-        })
-    }
-    const handleSubmit = async () => {
-        console.log(newExpense)
-    }
     return (
         <>
             <Sidebar></Sidebar>
             <IncomePageContainer>
                 <Header>
                     <Title>Expenses</Title>
-                    <TotalIncome>Total Expense: $16500</TotalIncome>
+                    <TotalIncome>Total Expense: {totalExpenses()}</TotalIncome>
                 </Header>
                 <ContentContainer>
                     <IncomeForm>
                         <FormField>
                             <Label>Expense Title</Label>
-                            <Input type="text" placeholder="Salary Title" onChange={e => setNewExpense({...newExpense, title: e.target.value})} />
+                            <Input type="text" placeholder="Salary Title"
+                                   onChange={e => setNewExpense({...newExpense, title: e.target.value})}/>
                         </FormField>
                         <FormField>
                             <Label>Expense Amount</Label>
-                            <Input type="number" placeholder="Salary Amount" onChange={e => setNewExpense({...newExpense, amount: e.target.value})} />
+                            <Input type="number" placeholder="Salary Amount"
+                                   onChange={e => setNewExpense({...newExpense, amount: e.target.value})}/>
                         </FormField>
                         <FormField>
                             <Label>Enter A Date</Label>
-                            <Input type="date" onChange={e => setNewExpense({...newExpense, date: e.target.value})} />
+                            <Input type="date" onChange={e => setNewExpense({...newExpense, date: e.target.value})}/>
                         </FormField>
                         <FormField>
                             <Label>Select Option</Label>
-                            <Select  onChange={e => setNewExpense({...newExpense, option: e.target.value})}>
-                                <option value="">Select Option</option>
-                                <option value="freelance">Freelance</option>
-                                <option value="shopify">Shopify</option>
-                                <option value="youtube">YouTube Adsense</option>
-                                <option value="developer">Developer Salary</option>
+                            <Select onChange={e => setNewExpense({...newExpense, option: e.target.value})}>
+                                <option value="" selected disabled hidden>Выберите категорию</option>
+                                <option value="Зарплата" >Зарплата</option>
+                                <option value="Подарки">Подарки</option>
+                                <option value="Фриланс">Фриланс</option>
+                                <option value="Прочие расходы">Прочие расходы</option>
                             </Select>
                         </FormField>
                         <FormField>
                             <Label>Add A Reference</Label>
-                            <Input type="text" placeholder="Add A Reference"   onChange={e => setNewExpense({...newExpense, description: e.target.value})}/>
+                            <Input type="text" placeholder="Add A Reference"
+                                   onChange={e => setNewExpense({...newExpense, description: e.target.value})}/>
                         </FormField>
-                        <AddIncomeButton onClick={handleSubmit}>+ Add Expense</AddIncomeButton>
+                        <AddIncomeButton onClick={() => createNewExpense(newExpense)}>+ Add Expense</AddIncomeButton>
                     </IncomeForm>
 
                     <IncomeList>
-                        {expense.map((item) => (
+                        {expenses.map((item) => (
                             <IncomeItem key={item.id}>
                                 <IncomeInfo>
                                     <IconWrapper>
-                                        <FontAwesomeIcon icon={faGlobe} color="#007bff" />
+                                        <FontAwesomeIcon icon={faGlobe} color="#007bff"/>
                                     </IconWrapper>
                                     <IncomeDetails>
-                                        <IncomeTitle>{item.title}</IncomeTitle>
+                                        <IncomeTitle>Название: {item.title}</IncomeTitle>
+                                        <IncomeDescription>Категория: {item.category}</IncomeDescription>
                                         <IncomeDescription>
-                                            ${item.amount} • {item.date} • {item.description}
+                                            Потрачено: {item.amount} руб. • Дата: {item.date} • Описание: {item.description}
                                         </IncomeDescription>
                                     </IncomeDetails>
                                 </IncomeInfo>
                                 <DeleteButton>
-                                    <FontAwesomeIcon icon={faTrashAlt} onClick={() => handleDelete(item.id)} />
+                                    <FontAwesomeIcon icon={faTrashAlt} onClick={() => deleteExpense(item.id)}/>
                                 </DeleteButton>
                             </IncomeItem>
                         ))}
