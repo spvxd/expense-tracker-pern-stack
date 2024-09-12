@@ -226,11 +226,11 @@ const Expense = () => {
                         </FormField>
                         <FormField>
                             <Label>Select Option</Label>
-                            <Select onChange={e => setNewExpense({...newExpense, option: e.target.value})}>
+                            <Select onChange={e => setNewExpense({...newExpense, category: e.target.value})}>
                                 <option value="" selected disabled hidden>Выберите категорию</option>
-                                <option value="Зарплата" >Зарплата</option>
-                                <option value="Подарки">Подарки</option>
-                                <option value="Фриланс">Фриланс</option>
+                                <option value="Еда" >Еда</option>
+                                <option value="Дом">Дом</option>
+                                <option value="Транспорт">Транспорт</option>
                                 <option value="Прочие расходы">Прочие расходы</option>
                             </Select>
                         </FormField>

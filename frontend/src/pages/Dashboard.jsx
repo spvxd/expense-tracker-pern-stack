@@ -5,6 +5,29 @@ import styled from "styled-components";
 import TransactionCard from "../components/TransactionCard";
 import Sidebar from "../components/Sidebar.jsx";
 import {useGlobalContext} from "../context/context.jsx";
+import {Chart as ChartJs,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    ArcElement,
+    RadialLinearScale
+} from 'chart.js'
+import {Line, Doughnut } from 'react-chartjs-2'
+ChartJs.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    ArcElement,
+    RadialLinearScale
+)
 
 // Стиль для контейнера Dashboard
 const DashboardContainer = styled.div`
@@ -33,13 +56,13 @@ const RightSection = styled.div`
 
 // Стиль для графика
 const GraphPlaceholder = styled.div`
-    height: 250px;
+    height: 400px;
     background-color: #eaeaea;
     border-radius: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 16px;
+    font-size: 22px;
     color: #666;
     margin-bottom: 20px; /* Добавляем отступ снизу */
 `;
@@ -96,12 +119,89 @@ const Dashboard = () => {
         getAllExpenses()
         getAllIncomes()
     }, []);
+
+
+
+    const graph = {
+        labels: incomes.map((inc) => {
+            return inc.date
+        }),
+        datasets: [{
+            label: 'Полученные',
+            data: [
+                ...incomes.map((inc) => {
+                    return inc.amount
+                })
+            ],
+            backgroundColor: 'green',
+            tension : .5
+        },
+            {
+                label: 'Потраченные',
+                data: [
+                    ...expenses.map((exp) => {
+                        return exp.amount
+                    })
+                ],
+                backgroundColor: 'red',
+                tension : .2
+            }
+        ]
+    }
+
+
+    const processData = (expenses) => {
+        const categoryMap = {};
+
+        expenses.forEach((expense) => {
+            if (categoryMap[expense.category]) {
+                categoryMap[expense.category] += expense.amount;
+            } else {
+                categoryMap[expense.category] = expense.amount;
+            }
+        });
+
+        const labels = Object.keys(categoryMap);
+        const data = Object.values(categoryMap);
+
+        return { labels, data };
+    };
+
+    const { labels, data } = processData(expenses);
+    const chartData = {
+        labels: labels,
+        datasets: [
+            {
+                label: 'Expenses',
+                data: data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                ],
+                borderWidth: 1,
+            },
+        ],
+    };
     return (
         <>
             <Sidebar></Sidebar>
             <DashboardContainer>
                 <LeftSection>
-                    <GraphPlaceholder>Graph Placeholder</GraphPlaceholder>
+                    <GraphPlaceholder>
+                        <Line data={graph}/>
+                    </GraphPlaceholder>
                     <StatsContainer>
                         <Card>
                             <CardTitle>Total Income</CardTitle>
@@ -120,10 +220,9 @@ const Dashboard = () => {
 
                 {/* Правая часть с историей и дополнительной информацией */}
                 <RightSection>
-                    <Header>Recent History</Header>
-                    <TransactionCard name="Dentist Appointment" amount="-120"/>
-                    <TransactionCard name="Travelling" amount="-3000"/>
-                    <TransactionCard name="Rent" amount="-800"/>
+                    <GraphPlaceholder>
+                        <Doughnut data={chartData}/>
+                    </GraphPlaceholder>
                     <Card style={{marginTop: "20px"}}>
                         <CardTitle>Salary</CardTitle>
                         <CardValue color="#333">
