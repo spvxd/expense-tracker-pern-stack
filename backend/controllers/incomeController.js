@@ -19,7 +19,7 @@ class IncomeController {
 
     async getAllIncomes(req, res) {
         try {
-            const allIncomes = await Income.findAll({raw: true, order: [['createdAt', 'DESC']]})
+            const allIncomes = await Income.findAll({raw: true, order: [['date', 'DESC']]})
             return res.status(200).json(allIncomes)
         } catch (err) {
             console.log(err)

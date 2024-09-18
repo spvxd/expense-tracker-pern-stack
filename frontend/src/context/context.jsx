@@ -8,6 +8,7 @@ const GlobalContext = React.createContext()
 export const GlobalProvider = ({children}) => {
     const [incomes, setIncomes] = useState([])
     const [expenses, setExpenses] = useState([])
+    const [transactions, setTransactions] = useState([])
     const [error, setError] = useState(null)
 
     const createNewExpense = async (data) => {
@@ -95,12 +96,23 @@ export const GlobalProvider = ({children}) => {
     const totalBalance = () => {
         return totalIncomes() - totalExpenses()
     }
+    const allTransactions = async () => {
+        try{
+            const res = await axios.get(`http://localhost:3000/expenses/allTransactions`)
+            setTransactions(res.data)
+            console.log(res.data)
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
 
 
     return (
         <GlobalContext.Provider value={{
             incomes,
             expenses,
+            transactions,
             totalIncomes,
             createNewExpense,
             getAllExpenses,
@@ -110,6 +122,7 @@ export const GlobalProvider = ({children}) => {
             deleteIncomes,
             totalExpenses,
             totalBalance,
+            allTransactions,
             error,
             setError
         }}>

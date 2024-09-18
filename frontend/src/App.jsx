@@ -8,6 +8,7 @@ import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import Sidebar from "./components/Sidebar.jsx";
 import Incomes from "./pages/Incomes.jsx";
 import Expense from "./pages/Expense.jsx";
+import Transactions from "./pages/Transactions.jsx";
 import { useGlobalContext } from './context/context.jsx';
 
 const AppContainer = styled.div`
@@ -23,6 +24,7 @@ function App() {
             <Router>
                 <Routes>
                     <Route path="/" element={<Dashboard/>}></Route>
+                    <Route path="/transactions" element={<Transactions/>}></Route>
                     <Route path="/incomes" element={<Incomes/>}></Route>
                     <Route path="/expense" element={<Expense/>}></Route>
                 </Routes>
