@@ -5,7 +5,8 @@ import styled from "styled-components";
 import TransactionCard from "../components/TransactionCard";
 import Sidebar from "../components/Sidebar.jsx";
 import {useGlobalContext} from "../context/context.jsx";
-import {Chart as ChartJs,
+import {
+    Chart as ChartJs,
     CategoryScale,
     LinearScale,
     PointElement,
@@ -16,7 +17,8 @@ import {Chart as ChartJs,
     ArcElement,
     RadialLinearScale
 } from 'chart.js'
-import {Line, Doughnut } from 'react-chartjs-2'
+import {Line, Doughnut} from 'react-chartjs-2'
+
 ChartJs.register(
     CategoryScale,
     LinearScale,
@@ -114,12 +116,19 @@ const CardValue = styled.div`
 `;
 
 const Dashboard = () => {
-    const {incomes, expenses, getAllIncomes, getAllExpenses, totalIncomes, totalExpenses, totalBalance} = useGlobalContext()
+    const {
+        incomes,
+        expenses,
+        getAllIncomes,
+        getAllExpenses,
+        totalIncomes,
+        totalExpenses,
+        totalBalance
+    } = useGlobalContext()
     useEffect(() => {
         getAllExpenses()
         getAllIncomes()
     }, []);
-
 
 
     const graph = {
@@ -134,7 +143,7 @@ const Dashboard = () => {
                 })
             ],
             backgroundColor: 'green',
-            tension : .5
+            tension: .5
         },
             {
                 label: 'Потраченные',
@@ -144,7 +153,7 @@ const Dashboard = () => {
                     })
                 ],
                 backgroundColor: 'red',
-                tension : .2
+                tension: .2
             }
         ]
     }
@@ -164,10 +173,10 @@ const Dashboard = () => {
         const labels = Object.keys(categoryMap);
         const data = Object.values(categoryMap);
 
-        return { labels, data };
+        return {labels, data};
     };
 
-    const { labels, data } = processData(expenses);
+    const {labels, data} = processData(expenses);
     const chartData = {
         labels: labels,
         datasets: [
@@ -226,15 +235,17 @@ const Dashboard = () => {
                     <Card style={{marginTop: "20px"}}>
                         <CardTitle>Salary</CardTitle>
                         <CardValue color="#333">
-                            <div>Min: {Math.min(...incomes.map(item => item.amount))} руб.</div>
-                            <div>Max: {Math.max(...incomes.map(item => item.amount))} руб.</div>
+                            <div>Min: {incomes.length ?
+                                Math.min(...incomes.map(item => item.amount)) : 0} руб.
+                            </div>
+                            <div>Max: {incomes.length ? Math.max(...incomes.map(item => item.amount)) : 0} руб.</div>
                         </CardValue>
                     </Card>
                     <Card style={{marginTop: "20px"}}>
                         <CardTitle>Expense</CardTitle>
                         <CardValue color="#333">
-                            <div>Min: {Math.min(...expenses.map(item => item.amount))} руб.</div>
-                            <div>Max: {Math.max(...expenses.map(item => item.amount))} руб.</div>
+                            <div>Min: {expenses.length ? Math.min(...expenses.map(item => item.amount)) : 0} руб.</div>
+                            <div>Max: {expenses.length ? Math.max(...expenses.map(item => item.amount)) : 0} руб.</div>
                         </CardValue>
                     </Card>
                 </RightSection>
