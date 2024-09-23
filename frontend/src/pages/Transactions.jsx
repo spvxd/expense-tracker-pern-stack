@@ -215,9 +215,7 @@ const Transactions = () => {
                                     </IncomeDescription>
                                 </IncomeDetails>
                             </IncomeInfo>
-                            <DeleteButton>
-                                <FontAwesomeIcon icon={faTrashAlt} onClick={() => deleteExpense(item.id)}/>
-                            </DeleteButton>
+
                         </IncomeItem>
                     ))}
                 </IncomeList>

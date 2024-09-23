@@ -1,10 +1,7 @@
-// src/components/Dashboard.js
-
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
-import TransactionCard from "../components/TransactionCard";
 import Sidebar from "../components/Sidebar.jsx";
-import {useGlobalContext} from "../context/context.jsx";
+import { useGlobalContext } from "../context/context.jsx";
 import {
     Chart as ChartJs,
     CategoryScale,
@@ -16,8 +13,8 @@ import {
     Legend,
     ArcElement,
     RadialLinearScale
-} from 'chart.js'
-import {Line, Doughnut} from 'react-chartjs-2'
+} from 'chart.js';
+import { Line,Doughnut } from 'react-chartjs-2';
 
 ChartJs.register(
     CategoryScale,
@@ -29,34 +26,30 @@ ChartJs.register(
     Legend,
     ArcElement,
     RadialLinearScale
-)
+);
 
-// Стиль для контейнера Dashboard
 const DashboardContainer = styled.div`
     display: flex;
-    justify-content: space-between; /* Распределяем элементы по сторонам */
+    justify-content: space-between;
     padding: 20px;
     background-color: #f8f9fa;
     flex: 1;
 `;
 
-// Левая часть, содержащая график и основную информацию
 const LeftSection = styled.div`
     display: flex;
-    flex-direction: column; /* Размещаем элементы вертикально */
-    width: 50%; /* Задаем ширину 50% */
-    padding-right: 20px; /* Добавляем отступ справа */
+    flex-direction: column;
+    width: 50%;
+    padding-right: 20px;
 `;
 
-// Правая часть, содержащая историю и другие данные
 const RightSection = styled.div`
     display: flex;
-    flex-direction: column; /* Размещаем элементы вертикально */
-    width: 50%; /* Задаем ширину 50% */
-    padding-left: 20px; /* Добавляем отступ слева */
+    flex-direction: column;
+    width: 50%;
+    padding-left: 20px;
 `;
 
-// Стиль для графика
 const GraphPlaceholder = styled.div`
     height: 400px;
     background-color: #eaeaea;
@@ -66,24 +59,15 @@ const GraphPlaceholder = styled.div`
     align-items: center;
     font-size: 22px;
     color: #666;
-    margin-bottom: 20px; /* Добавляем отступ снизу */
+    margin-bottom: 20px;
 `;
 
-// Стиль для карточек статистики
 const StatsContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 20px;
 `;
 
-// Стиль для заголовков
-const Header = styled.h2`
-    font-size: 20px;
-    color: #333;
-    margin-bottom: 10px;
-`;
-
-// Стиль для контейнера карточки
 const Card = styled.div`
     background-color: #fff;
     border-radius: 8px;
@@ -100,7 +84,6 @@ const Card = styled.div`
     }
 `;
 
-// Стиль для заголовка карточки
 const CardTitle = styled.h3`
     font-size: 18px;
     color: #333;
@@ -108,7 +91,6 @@ const CardTitle = styled.h3`
     text-align: center;
 `;
 
-// Стиль для значения в карточке
 const CardValue = styled.div`
     font-size: 24px;
     font-weight: bold;
@@ -123,42 +105,70 @@ const Dashboard = () => {
         getAllExpenses,
         totalIncomes,
         totalExpenses,
-        totalBalance
-    } = useGlobalContext()
+        totalBalance,
+        allTransactions
+    } = useGlobalContext();
+
     useEffect(() => {
-        getAllExpenses()
-        getAllIncomes()
+        getAllExpenses();
+        getAllIncomes();
+        allTransactions();
     }, []);
 
+    // Функция для суммирования значений на одинаковые даты
+    const sumByDate = (data) => {
+        return data.reduce((acc, item) => {
+            if (!acc[item.date]) {
+                acc[item.date] = 0;
+            }
+            acc[item.date] += item.amount;
+            return acc;
+        }, {});
+    };
+
+    const groupedIncomes = sumByDate(incomes);
+    const groupedExpenses = sumByDate(expenses);
+
+    // Функция для объединения дат доходов и расходов в единый массив
+    const mergeDates = () => {
+        const allDates = [
+            ...new Set([...Object.keys(groupedIncomes), ...Object.keys(groupedExpenses)])
+        ];
+        allDates.sort((a, b) => new Date(a) - new Date(b)); // Сортируем даты
+        return allDates;
+    };
+
+    const mergedDates = mergeDates();
+
+    // Подготовка данных для графика доходов
+    const incomeData = mergedDates.map(date => groupedIncomes[date] || null);
+
+    // Подготовка данных для графика расходов
+    const expenseData = mergedDates.map(date => groupedExpenses[date] || null);
 
     const graph = {
-        labels: incomes.map((inc) => {
-            return inc.date
-        }),
-        datasets: [{
-            label: 'Полученные',
-            data: [
-                ...incomes.map((inc) => {
-                    return inc.amount
-                })
-            ],
-            backgroundColor: 'green',
-            tension: .5
-        },
+        labels: mergedDates, // Все уникальные даты
+        datasets: [
             {
-                label: 'Потраченные',
-                data: [
-                    ...expenses.map((exp) => {
-                        return exp.amount
-                    })
-                ],
+                label: 'Доходы',
+                data: incomeData,
+                backgroundColor: 'green',
+                borderColor: 'green',
+                fill: false,
+                tension: 0.4,
+                spanGaps: true // Соединять пропуски
+            },
+            {
+                label: 'Расходы',
+                data: expenseData,
                 backgroundColor: 'red',
-                tension: .2
+                borderColor: 'red',
+                fill: false,
+                tension: 0.4,
+                spanGaps: true // Соединять пропуски
             }
         ]
-    }
-
-
+    };
     const processData = (expenses) => {
         const categoryMap = {};
 
@@ -227,7 +237,6 @@ const Dashboard = () => {
                     </StatsContainer>
                 </LeftSection>
 
-                {/* Правая часть с историей и дополнительной информацией */}
                 <RightSection>
                     <GraphPlaceholder>
                         <Doughnut data={chartData}/>
